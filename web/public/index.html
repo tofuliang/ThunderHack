@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>迅雷離線地址獲取工具</title>
+		<link rel="stylesheet" href="/bower_components/foundation/css/foundation.min.css">
+		<script src="/bower_components/jquery/dist/jquery.min.js" type="text/javascript"></script>
+		<script src="/bower_components/jquery-cookie/jquery.cookie.js" type="text/javascript"></script>
+		<script src="/bower_components/foundation/js/foundation.min.js" type="text/javascript"></script>
+		<script src="/bower_components/foundation/js/foundation/foundation.topbar.js" type="text/javascript"></script>
+		<script src="/js/index.js" type="text/javascript"></script>
+	</head>
+	<body>
+		<nav class="top-bar" data-topbar role="navigation">
+		  <ul class="title-area">
+		    <li class="name">
+		      <h1><a href="/">迅雷離線地址獲取工具</a></h1>
+		    </li>
+		    <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+		  </ul>
+
+		  <section class="top-bar-section">
+		    <!-- Right Nav Section -->
+		    <ul class="right">
+		      <li><a href="https://github.com/Chion82/ThunderHack.git" target="_blank">Fork Me on GitHub!</a></li>
+		    </ul>
+
+		    <!-- Left Nav Section -->
+		    <ul class="left">
+		      <li class="active"><a href="/">提交任務</a></li>
+		      <li><a href="/multi_task.html">批量任務</a></li>
+		      <li><a href="https://github.com/Chion82/ThunderHack/raw/master/chrome-ext.crx">下載Chrome插件</a></li>
+		      <li><a href="#">API(Coming Soon)</a></li>
+		    </ul>
+		  </section>
+		</nav>
+		<div class="row" style="margin-top:20px;">
+			<div class="large-12 columns">
+				<div class="row">
+					<div class="large-12 columns">
+						輸入资源地址（http/https/ftp/magnet/ed2k/thunder）：
+					</div>
+				</div>
+				<div class="row collapse">
+					<div class="small-10 columns">
+						<input type="text" id="magnet_input">
+					</div>
+					<div class="small-2 columns">
+						<button id="submit_task_btn" class="button postfix">提交下載任務</button>
+					</div>
+				</div>
+				<div class="panel">
+					<div class="row">
+						只有.torrent文件？<a href="http://tool.idanmu.com" target="_blank">點這裏</a>轉換成magnet
+						<br/>如果提示-12失敗，請多試幾次<br/>
+					</div>
+					<div class="row">
+						<div id="hint_submit" style="color:red;"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="large-12 columns">
+				<div class="row">
+					<div class="large-12 columns">
+						或者，輸入任務ID查詢狀態：
+					</div>
+				</div>
+				<div class="row collapse">
+					<div class="small-10 columns">
+						<input type="text" id="task_id_input">
+					</div>
+					<div class="small-2 columns">
+						<button id="submit_task_id_btn" class="button postfix">查詢</button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="large-12 columns">
+						<div id="hint_task" class="panel callout">Stand by.</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="large-12 columns">
+						<div id="gdriveid_div" class="panel callout" style="overflow:auto;"></div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="large-12 columns">
+						下載前請先進入<a href="http://vip.xunlei.com/" target="_blank">vip.xunlei.com</a>添加該Cookie<br/>
+						或者，妳可以<a href="https://github.com/Chion82/ThunderHack/raw/master/chrome-ext.crx" target="_blank">下載Chrome插件</a>壹鍵完成該操作。下載前點擊“啟用”即可。<br/>
+						<br/>ChangeLog: 
+						<br/>
+						8.20 新增批量任務功能<br/>
+						8.19 首頁美化<br/>
+						8.14 Chrome插件更新，修复Windows下乱码问题，请重新下载crx插件包
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<hr>
+		<footer>
+			<div class="row">
+				<div class="large-12 columns">
+					Author: <a href="https://github.com/Chion82" target="_blank">Chion82</a>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>

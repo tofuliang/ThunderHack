@@ -1,0 +1,1 @@
+curl "http://dynamic.cloud.vip.xunlei.com/interface/bt_task_commit?callback=jsonp" --data "uid=208115253&btname=%5BVCB-Studio%5DOre%20no%20Imoto%20II%5BBDRip%5D%5B720p%5D&cid=VYZOD7YVAOR73VUY74B3ZADSJR2QMHBG&goldbean=0&silverbean=0&findex=0_1_2_3_4_5_6_7_8_9_10_11_12_13_14_15_16"

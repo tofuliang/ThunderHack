@@ -1,0 +1,20 @@
+{
+  "name": "ThunderHack",
+  "version": "1.0.0",
+  "homepage": "https://github.com/Chion82/ThunderHack",
+  "authors": [
+    "Chion82 <sdspeedonion@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "~5.5.2",
+    "jquery-cookie": "~1.4.1"
+  }
+}
