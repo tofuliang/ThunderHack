@@ -1,3 +1,5 @@
+# -*- coding: UTF-8 -*-
+
 import requests
 from urllib import quote
 import re
@@ -126,9 +128,12 @@ def reload_config():
 
 @app.route('/api/commit_magnet.do', methods=['POST'])
 def API_commit_magnet_task():
-	bt_info = query_bt_info(request.form['magnet_link'])
-	commit_result = commit_bt_task(bt_info)
-	return jsonify(commit_result)
+	try:
+		bt_info = query_bt_info(request.form['magnet_link'])
+		commit_result = commit_bt_task(bt_info)
+		return jsonify(commit_result)
+	except Exception:
+		return jsonify({'status':'Failed', 'error':'无法解析的下载链接'})
 
 @app.route('/api/commit_normal_task.do', methods=['POST'])
 def API_commit_normal_task():
