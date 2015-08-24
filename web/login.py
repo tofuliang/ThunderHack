@@ -3,7 +3,7 @@ from urllib import quote, unquote
 import re
 import json
 
-PASSWORD_ENCRYPT_HOST = 'http://localhost:3000'
+PASSWORD_ENCRYPT_HOST = 'http://localhost:3010'
 
 def thunder_login():
 	#Load login info from configuration JSON file
