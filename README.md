@@ -1,6 +1,6 @@
 #Thunder Hack
 
-Temperarily online link: http://chiontang.zyns.com:90/
+Temperary online link: http://chiontang.zyns.com:90/
 
 #Description
 
