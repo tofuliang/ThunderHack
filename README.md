@@ -1,6 +1,6 @@
 #Thunder Hack
 
-Temperary online link: http://chiontang.zyns.com:90/
+http://syslab.ddns.us/thunder_hack
 
 #Description
 
