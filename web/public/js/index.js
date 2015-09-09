@@ -8,7 +8,7 @@ $(document).ready(function(){
 			return;
 		}
 		if ($('#magnet_input').val().substr(0,8)!='magnet:?') {
-			$.post('/api/commit_normal_task.do', {
+			$.post('api/commit_normal_task.do', {
 				link : $('#magnet_input').val()
 			}, function(data){
 				if (data.status == 'OK') {
@@ -22,7 +22,7 @@ $(document).ready(function(){
 			})
 			return;
 		}
-		$.post('/api/commit_magnet.do', {
+		$.post('api/commit_magnet.do', {
 			magnet_link : $('#magnet_input').val()
 		}, function(data){
 			if (data.status == 'OK') {
@@ -42,7 +42,7 @@ $(document).ready(function(){
 			$('#hint_task').html('<div style="color:red;">妳在逗我麽(ノ=Д=)ノ┻━┻ </div>');
 			return;
 		}
-		$.get('/api/task/' + encodeURIComponent($('#task_id_input').val()), function(data){
+		$.get('api/task/' + encodeURIComponent($('#task_id_input').val()), function(data){
 			if (data.status == 'OK') {
 				$('#hint_task').html('任務已完成<br/>');
 				$('#hint_task').append('<ul>')
@@ -62,7 +62,7 @@ $(document).ready(function(){
 	});
 
 	var gdriveid = '';
-	$.get('/api/gdriveid', function(data){
+	$.get('api/gdriveid', function(data){
 		gdriveid = data.gdriveid;
 		$('#gdriveid_div').html('離線服務器Cookies：gdriveid=' + gdriveid + '');
 	});

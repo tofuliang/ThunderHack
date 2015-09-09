@@ -13,13 +13,13 @@ var submit_single_task = function(download_link, success_callback, fail_callback
 		}
 	};
 	if (download_link.substr(0,8)!='magnet:?') {
-		$.post('/api/commit_normal_task.do', {
+		$.post('api/commit_normal_task.do', {
 			link : download_link
 		}, function(data){
 			callback(data);
 		});
 	} else {
-		$.post('/api/commit_magnet.do', {
+		$.post('api/commit_magnet.do', {
 			magnet_link : download_link
 		}, function(data){
 			callback(data);
@@ -43,7 +43,7 @@ var submit_multi_task = function(download_links, prompt_func, success_callback, 
 }
 
 var query_single_task = function(task_id, callback) {
-	$.get('/api/task/' + encodeURIComponent(task_id), function(data){ 
+	$.get('api/task/' + encodeURIComponent(task_id), function(data){ 
 		callback(data);
 	});
 }
@@ -88,7 +88,7 @@ $(document).ready(function(){
 	});
 
 	var gdriveid = '';
-	$.get('/api/gdriveid', function(data){
+	$.get('api/gdriveid', function(data){
 		gdriveid = data.gdriveid;
 		$('#gdriveid_div').html('離線服務器Cookies：gdriveid=' + gdriveid + '');
 	});
