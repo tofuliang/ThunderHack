@@ -103,7 +103,7 @@ try:
 	session.headers.update({'Cookie':cookie, 'User-Agent':user_agent})
 
 	uid = re.search(r'userid=(\w+?);', cookie).group(1)
-	gdriveid = re.search(r'gdriveid=(.*?);', cookie).group(1)
+	gdriveid = re.search(r'gdriveid=(\w+?);', cookie).group(1)
 except Exception:
 	thunder_login()
 	print('Generating cookie.txt. Please Re-run this script.')
@@ -124,7 +124,7 @@ def reload_config():
 	session = requests.session()
 	session.headers.update({'Cookie':cookie, 'User-Agent':user_agent})
 	uid = re.search(r'userid=(\w+?);', cookie).group(1)
-	gdriveid = re.search(r'gdriveid=(.*?);', cookie).group(1)
+	gdriveid = re.search(r'gdriveid=(\w+?);', cookie).group(1)
 
 @app.route('/api/commit_magnet.do', methods=['POST'])
 def API_commit_magnet_task():
@@ -154,7 +154,7 @@ def API_get_gdriveid():
 
 @app.route('/')
 def index():
-	return redirect('/index.html')
+	return '<script>window.location.href="index.html"</script>'
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', port=90, debug=True)
