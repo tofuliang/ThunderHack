@@ -6,8 +6,8 @@ import re
 import json
 from flask import Flask, request, jsonify, redirect
 from login import thunder_login
-from apscheduler.schedulers.background import BackgroundScheduler
 import datetime
+import thread, time
 
 def query_bt_info(download_link):
 	request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/url_query?callback=queryUrl&u=' + quote(download_link))
@@ -111,20 +111,21 @@ except Exception:
 
 app = Flask(__name__, static_folder='public', static_url_path='')
 
-sched = BackgroundScheduler()
-sched.start()
 
-@sched.scheduled_job('interval', id="scheduled_reload",hours=6, next_run_time=datetime.datetime.now(), max_instances=1)
 def reload_config():
 	global cookie, session, uid, gdriveid
-	print('Reloading config.')
-	thunder_login()
-	cookie = str(open('cookie.txt','rb').read()).replace('\n','')
-	session.close()
-	session = requests.session()
-	session.headers.update({'Cookie':cookie, 'User-Agent':user_agent})
-	uid = re.search(r'userid=(\w+?);', cookie).group(1)
-	gdriveid = re.search(r'gdriveid=(\w+?);', cookie).group(1)
+	while True:
+		print('Reloading config.')
+		thunder_login()
+		cookie = str(open('cookie.txt','rb').read()).replace('\n','')
+		session.close()
+		session = requests.session()
+		session.headers.update({'Cookie':cookie, 'User-Agent':user_agent})
+		uid = re.search(r'userid=(\w+?);', cookie).group(1)
+		gdriveid = re.search(r'gdriveid=(\w+?);', cookie).group(1)
+		time.sleep(60*60*6)
+
+thread.start_new_thread(reload_config, ())
 
 @app.route('/api/commit_magnet.do', methods=['POST'])
 def API_commit_magnet_task():
