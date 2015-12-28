@@ -9,19 +9,26 @@ from login import thunder_login
 import datetime
 import thread, time
 
-def query_bt_info(download_link):
-	request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/url_query?callback=queryUrl&u=' + quote(download_link))
-	match = re.search(r"queryUrl\(1,'(?P<cid>.*?)','.*?','(?P<btname>.*?)','.*?',new Array\(.*?\),new Array\(.*?\),new Array\(.*?\),new Array\(.*?\),new Array\(.*?\),new Array\((?P<findex>.*?)\),new Array\(.*?\),.*?,.*?\)", str(request_result.content))
-	cid = match.group('cid')
-	btname = match.group('btname')
-	findex_raw = match.group('findex')
-	findex = findex_raw.replace("'",'').replace(',','_')
-	print('cid : ' + cid)
-	print('btname : ' + btname)
-	print('findex : ' + findex)
-	return {'cid':cid,'btname':btname,'findex':findex}
+def query_bt_info(download_link, retry=10):
+	if (retry <= 0):
+		raise Exception('BTQueryError')
+	try:
+		request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/url_query?callback=queryUrl&u=' + quote(download_link))
+		match = re.search(r"queryUrl\(1,'(?P<cid>.*?)','.*?','(?P<btname>.*?)','.*?',new Array\(.*?\),new Array\(.*?\),new Array\(.*?\),new Array\(.*?\),new Array\(.*?\),new Array\((?P<findex>.*?)\),new Array\(.*?\),.*?,.*?\)", str(request_result.content))
+		cid = match.group('cid')
+		btname = match.group('btname')
+		findex_raw = match.group('findex')
+		findex = findex_raw.replace("'",'').replace(',','_')
+		print('cid : ' + cid)
+		print('btname : ' + btname)
+		print('findex : ' + findex)
+		return {'cid':cid,'btname':btname,'findex':findex}
+	except Exception:
+		return query_bt_info(download_link, retry-1)
 
-def commit_bt_task(bt_info):
+def commit_bt_task(bt_info, retry=10):
+	if (retry <= 0):
+		return {'status':'Failed', 'error':'提交失败，请重试。'}
 	payload = {
 		'uid' : uid,
 		'btname' : bt_info['btname'],
@@ -30,22 +37,30 @@ def commit_bt_task(bt_info):
 		'silverbean' : 0,
 		'findex' : bt_info['findex']
 	}
-	request_result = session.post('http://dynamic.cloud.vip.xunlei.com/interface/bt_task_commit?callback=jsonp', data=payload)
-	result_json = str(request_result.content)[6:]
-	result_json = result_json[0:len(result_json)-1]
-	result = json.loads(result_json)
-	if ('id' in result):
-		if (len(result['id'])>5):
-			return {'status':'OK','task_id':str(result['id'])}
-	return {'status':'Failed', 'error':result}
+	try:
+		request_result = session.post('http://dynamic.cloud.vip.xunlei.com/interface/bt_task_commit?callback=jsonp', data=payload)
+		result_json = str(request_result.content)[6:]
+		result_json = result_json[0:len(result_json)-1]
+		result = json.loads(result_json)
+		if ('id' in result):
+			if (len(result['id'])>5):
+				return {'status':'OK','task_id':str(result['id'])}
+		return {'status':'Failed', 'error':result}
+	except Exception:
+		return commit_bt_task(bt_info, retry-1)
 
-def commit_normal_task(url):
-	result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/task_commit?callback=ret_task&uid=' + uid + '&url=' + quote(url))
-	match = re.search(r'ret_task\(.*?,\'(.*?)\',\'.*?\'\)', str(result.content))
-	if (not match):
-		return {'status' : 'Failed', 'error': str(result.content)}
-	else:
-		return {'status' : 'OK', 'task_id' : str(match.group(1))}
+def commit_normal_task(url, retry=10):
+	if (retry <= 0):
+		return {'status':'Failed', 'error':'提交失败，请重试。'}
+	try:
+		result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/task_commit?callback=ret_task&uid=' + uid + '&url=' + quote(url))
+		match = re.search(r'ret_task\(.*?,\'(.*?)\',\'.*?\'\)', str(result.content))
+		if (not match):
+			return {'status' : 'Failed', 'error': str(result.content)}
+		else:
+			return {'status' : 'OK', 'task_id' : str(match.group(1))}
+	except Exception:
+		return commit_normal_task(url, retry-1)
 
 def find_task(task_id):
 	page = 1
