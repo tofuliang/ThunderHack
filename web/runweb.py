@@ -45,6 +45,8 @@ def commit_bt_task(bt_info, retry=10):
 		if ('id' in result):
 			if (len(result['id'])>5):
 				return {'status':'OK','task_id':str(result['id'])}
+		if '"progress":-12' in str(request_result.content):
+			raise Exception('CommitFailed')
 		return {'status':'Failed', 'error':result}
 	except Exception:
 		return commit_bt_task(bt_info, retry-1)
@@ -56,6 +58,8 @@ def commit_normal_task(url, retry=10):
 		result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/task_commit?callback=ret_task&uid=' + uid + '&url=' + quote(url))
 		match = re.search(r'ret_task\(.*?,\'(.*?)\',\'.*?\'\)', str(result.content))
 		if (not match):
+			if '"progress":-12' in str(request.content):
+				raise Exception('CommitFailed')
 			return {'status' : 'Failed', 'error': str(result.content)}
 		else:
 			return {'status' : 'OK', 'task_id' : str(match.group(1))}
