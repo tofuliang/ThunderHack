@@ -77,17 +77,18 @@ def find_task(task_id):
 	while page <= 10:
 		try:
 			request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/showtask_unfresh?callback=jsonp&type_id=4&page=' + str(page) + '&tasknum=30&p=' + str(page) + '&interfrom=task')
-			result_json = str(request_result.content)[6:]
-			result_json = result_json[0:len(result_json)-1]
-			result = json.loads(result_json)
-			if (result['rtcode'] != 0):
-				return {'status':'Failed', 'error': result}
-			for task in result['info']['tasks']:
-				if (str(task['id']) == task_id):
-					return {'status':'OK', 'task':task}
-			page = page + 1
 		except Exception:
 			continue
+		result_json = str(request_result.content)[6:]
+		result_json = result_json[0:len(result_json)-1]
+		result = json.loads(result_json)
+		if (result['rtcode'] != 0):
+			return {'status':'Failed', 'error': result}
+		for task in result['info']['tasks']:
+			if (str(task['id']) == task_id):
+				return {'status':'OK', 'task':task}
+		page = page + 1
+		
 	return {'status':'Task Not Found'}
 
 def get_task(task_info):
@@ -106,12 +107,11 @@ def get_task(task_info):
 	while True:
 		try:
 			request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/fill_bt_list?callback=fill_bt_list&tid=' + task_info['id'] + '&infoid=' + task_info['cid'] + '&g_net=1&p=' + str(page) + '&uid=' + uid + '&interfrom=task')
-
-			result_json = str(request_result.content)[13:]
-			result_json = result_json[0:len(result_json)-1]
-			result = json.loads(result_json)
 		except Exception:
 			continue
+		result_json = str(request_result.content)[13:]
+		result_json = result_json[0:len(result_json)-1]
+		result = json.loads(result_json)
 
 		try:
 			for record in result['Result']['Record']:
