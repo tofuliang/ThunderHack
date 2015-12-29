@@ -7,9 +7,10 @@ import json
 from flask import Flask, request, jsonify, redirect
 from login import thunder_login
 import datetime
-import thread, time
+import thread, time, os
 
 def query_bt_info(download_link, retry=10):
+	session = app.config['thunder_session']
 	if (retry <= 0):
 		raise Exception('BTQueryError')
 	try:
@@ -27,6 +28,8 @@ def query_bt_info(download_link, retry=10):
 		return query_bt_info(download_link, retry-1)
 
 def commit_bt_task(bt_info, retry=10):
+	session = app.config['thunder_session']
+	uid = app.config['thunder_uid']
 	if (retry <= 0):
 		return {'status':'Failed', 'error':'提交失败，请重试。'}
 	payload = {
@@ -52,6 +55,8 @@ def commit_bt_task(bt_info, retry=10):
 		return commit_bt_task(bt_info, retry-1)
 
 def commit_normal_task(url, retry=10):
+	session = app.config['thunder_session']
+	uid = app.config['thunder_uid']
 	if (retry <= 0):
 		return {'status':'Failed', 'error':'提交失败，请重试。'}
 	try:
@@ -67,21 +72,27 @@ def commit_normal_task(url, retry=10):
 		return commit_normal_task(url, retry-1)
 
 def find_task(task_id):
+	session = app.config['thunder_session']
 	page = 1
 	while page <= 10:
-		request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/showtask_unfresh?callback=jsonp&type_id=4&page=' + str(page) + '&tasknum=30&p=' + str(page) + '&interfrom=task')
-		result_json = str(request_result.content)[6:]
-		result_json = result_json[0:len(result_json)-1]
-		result = json.loads(result_json)
-		if (result['rtcode'] != 0):
-			return {'status':'Failed', 'error': result}
-		for task in result['info']['tasks']:
-			if (str(task['id']) == task_id):
-				return {'status':'OK', 'task':task}
-		page = page + 1
+		try:
+			request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/showtask_unfresh?callback=jsonp&type_id=4&page=' + str(page) + '&tasknum=30&p=' + str(page) + '&interfrom=task')
+			result_json = str(request_result.content)[6:]
+			result_json = result_json[0:len(result_json)-1]
+			result = json.loads(result_json)
+			if (result['rtcode'] != 0):
+				return {'status':'Failed', 'error': result}
+			for task in result['info']['tasks']:
+				if (str(task['id']) == task_id):
+					return {'status':'OK', 'task':task}
+			page = page + 1
+		except Exception:
+			continue
 	return {'status':'Task Not Found'}
 
 def get_task(task_info):
+	session = app.config['thunder_session']
+	uid = app.config['thunder_uid']
 	if (task_info['progress'] != 100):
 		return {'status':'Task Not Finished', 'progress': task_info['progress']}
 	if (task_info['filetype'] != 'TORRENT'):
@@ -93,11 +104,14 @@ def get_task(task_info):
 	page = 1
 	all_records = []
 	while True:
-		request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/fill_bt_list?callback=fill_bt_list&tid=' + task_info['id'] + '&infoid=' + task_info['cid'] + '&g_net=1&p=' + str(page) + '&uid=' + uid + '&interfrom=task')
+		try:
+			request_result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/fill_bt_list?callback=fill_bt_list&tid=' + task_info['id'] + '&infoid=' + task_info['cid'] + '&g_net=1&p=' + str(page) + '&uid=' + uid + '&interfrom=task')
 
-		result_json = str(request_result.content)[13:]
-		result_json = result_json[0:len(result_json)-1]
-		result = json.loads(result_json)
+			result_json = str(request_result.content)[13:]
+			result_json = result_json[0:len(result_json)-1]
+			result = json.loads(result_json)
+		except Exception:
+			continue
 
 		try:
 			for record in result['Result']['Record']:
@@ -111,40 +125,29 @@ def get_task(task_info):
 
 	return {'status':'OK', 'records':all_records}
 
-user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.125 Safari/537.36'
-
-#print('Enter cookie:')
-#cookie = raw_input()
-try:
+def reload_config():
+	try:
+		if time.time() - os.path.getmtime('cookie.txt') > 60:
+			print('Re-login...')
+			thunder_login()
+	except Exception:
+		print('cookie.txt not found. Generating.')
+		thunder_login()
+	user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.125 Safari/537.36'
 	cookie = str(open('cookie.txt','rb').read()).replace('\n','')
-
+	app.config['thunder_cookie'] = cookie
 	session = requests.session()
 	session.headers.update({'Cookie':cookie, 'User-Agent':user_agent})
-
-	uid = re.search(r'userid=(\w+?);', cookie).group(1)
-	gdriveid = re.search(r'gdriveid=(\w+?);', cookie).group(1)
-except Exception:
-	thunder_login()
-	print('Generating cookie.txt. Please Re-run this script.')
-	exit()
+	app.config['thunder_session'] = session
+	app.config['thunder_uid'] = re.search(r'userid=(\w+?);', cookie).group(1)
+	app.config['thunder_gdriveid'] = re.search(r'gdriveid=(\w+?);', cookie).group(1)
 
 app = Flask(__name__, static_folder='public', static_url_path='')
 
-
-def reload_config():
-	global cookie, session, uid, gdriveid
-	while True:
-		print('Reloading config.')
-		thunder_login()
-		cookie = str(open('cookie.txt','rb').read()).replace('\n','')
-		session.close()
-		session = requests.session()
-		session.headers.update({'Cookie':cookie, 'User-Agent':user_agent})
-		uid = re.search(r'userid=(\w+?);', cookie).group(1)
-		gdriveid = re.search(r'gdriveid=(\w+?);', cookie).group(1)
-		time.sleep(60*60*6)
-
-thread.start_new_thread(reload_config, ())
+@app.route('/api/reload.do')
+def API_reload_config():
+	reload_config()
+	return jsonify({'status':'OK'})
 
 @app.route('/api/commit_magnet.do', methods=['POST'])
 def API_commit_magnet_task():
@@ -170,24 +173,16 @@ def API_get_task_info(task_id):
 
 @app.route('/api/gdriveid', methods=['GET'])
 def API_get_gdriveid():
-	return jsonify({'gdriveid':gdriveid})
+	return jsonify({'gdriveid':app.config['thunder_gdriveid']})
 
 @app.route('/')
 def index():
 	return '<script>window.location.href="index.html"</script>'
 
 if __name__ == '__main__':
+	reload_config()
 	app.run(host='0.0.0.0', port=90, debug=True)
-	'''
-	print('Enter download link:')
-	download_link = raw_input()
-	if download_link.startswith('magnet'):
-		bt_info = query_bt_info()
-		commit_result = commit_bt_task(bt_info)
-		print(commit_result)
 
-	task_id = raw_input()
-	task = find_task(task_id)
-	task_records = get_task(task['task'])
-	print(task_records)
-	'''
+def run_app(environ, start_response):
+    reload_config()
+    return app(environ, start_response)

@@ -29,8 +29,6 @@ $ node crypto_server.js
 $ sudo python runweb.py
 ```
 
-* Re-run the web server by using the command above.
-
 #Usage:
 
 The recommanded way to use this app is simply installing the Chrome extension by dragging the ```chrome-ext.crx``` to your Chrome extension management page. Before downloading files on Lixian servers, remember to click the activate button in the popup panel of the extension, or the Lixian servers are likely to reject the download request with 400 responses.
