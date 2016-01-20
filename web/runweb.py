@@ -10,6 +10,7 @@ import datetime
 import thread, time, os
 
 def query_bt_info(download_link, retry=10):
+	reload_config(True)
 	session = app.config['thunder_session']
 	if (retry <= 0):
 		raise Exception('BTQueryError')
@@ -28,6 +29,7 @@ def query_bt_info(download_link, retry=10):
 		return query_bt_info(download_link, retry-1)
 
 def commit_bt_task(bt_info, retry=10):
+	reload_config(True)
 	session = app.config['thunder_session']
 	uid = app.config['thunder_uid']
 	if (retry <= 0):
@@ -55,6 +57,7 @@ def commit_bt_task(bt_info, retry=10):
 		return commit_bt_task(bt_info, retry-1)
 
 def commit_normal_task(url, retry=10):
+	reload_config(True)
 	session = app.config['thunder_session']
 	uid = app.config['thunder_uid']
 	if (retry <= 0):
@@ -72,6 +75,7 @@ def commit_normal_task(url, retry=10):
 		return commit_normal_task(url, retry-1)
 
 def find_task(task_id):
+	reload_config(True)
 	session = app.config['thunder_session']
 	page = 1
 	while page <= 10:
@@ -88,10 +92,11 @@ def find_task(task_id):
 			if (str(task['id']) == task_id):
 				return {'status':'OK', 'task':task}
 		page = page + 1
-		
+
 	return {'status':'Task Not Found'}
 
 def get_task(task_info):
+	reload_config(True)
 	session = app.config['thunder_session']
 	uid = app.config['thunder_uid']
 	if (task_info['progress'] != 100):
@@ -125,14 +130,15 @@ def get_task(task_info):
 
 	return {'status':'OK', 'records':all_records}
 
-def reload_config():
-	try:
-		if time.time() - os.path.getmtime('cookie.txt') > 60:
-			print('Re-login...')
+def reload_config(from_file=False):
+	if from_file == False:
+		try:
+			if time.time() - os.path.getmtime('cookie.txt') > 60:
+				print('Re-login...')
+				thunder_login()
+		except Exception:
+			print('cookie.txt not found. Generating.')
 			thunder_login()
-	except Exception:
-		print('cookie.txt not found. Generating.')
-		thunder_login()
 	user_agent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.125 Safari/537.36'
 	cookie = str(open('cookie.txt','rb').read()).replace('\n','')
 	app.config['thunder_cookie'] = cookie
