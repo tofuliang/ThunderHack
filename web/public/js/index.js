@@ -3,15 +3,18 @@ $(document).ready(function(){
 
 	$('#submit_task_btn').click(function(){
 		$('#hint_submit').html('Loading...');
-		if ($('#magnet_input').val() == '') {
+		$('#verify_code_image').attr('src', '/api/verify_code?time=' + Date.now());
+		if ($('#magnet_input').val() === '') {
 			$('#hint_submit').html('妳在逗我麽(ノ=Д=)ノ┻━┻ ');
 			return;
 		}
 		if ($('#magnet_input').val().substr(0,8)!='magnet:?') {
 			$.post('api/commit_normal_task.do', {
-				link : $('#magnet_input').val()
+				link : $('#magnet_input').val(),
+				verify_code : $('#verify_code_input').val(),
+				verify_key : $.cookie('verify_key')
 			}, function(data){
-				if (data.status == 'OK') {
+				if (data.status === 'OK') {
 					$('#hint_submit').html('提交成功，任务ID为：' + data.task_id);
 					$.cookie('task_id', data.task_id, {expires:30});
 					$('#task_id_input').val(data.task_id);
@@ -23,9 +26,11 @@ $(document).ready(function(){
 			return;
 		}
 		$.post('api/commit_magnet.do', {
-			magnet_link : $('#magnet_input').val()
+			magnet_link : $('#magnet_input').val(),
+			verify_code : $('#verify_code_input').val(),
+			verify_key : $.cookie('verify_key')
 		}, function(data){
-			if (data.status == 'OK') {
+			if (data.status === 'OK') {
 				$('#hint_submit').html('提交成功，任务ID为：' + data.task_id);
 				$.cookie('task_id', data.task_id, {expires:30});
 				$('#task_id_input').val(data.task_id);
@@ -43,7 +48,7 @@ $(document).ready(function(){
 			return;
 		}
 		$.get('api/task/' + encodeURIComponent($('#task_id_input').val()), function(data){
-			if (data.status == 'OK') {
+			if (data.status === 'OK') {
 				$('#hint_task').html('任務已完成<br/>');
 				$('#hint_task').append('<ul>')
 				for (index in data.records) {
@@ -51,11 +56,11 @@ $(document).ready(function(){
 					$('#hint_task').append('<li><a target="_blank" href="' + record.downurl + '">' + record.title + ' ' + record.size + '</a></li>');
 				}
 				$('#hint_task').append('</ul>')
-			} else if (data.status == 'Task Not Found') {
+			} else if (data.status === 'Task Not Found') {
 				$('#hint_task').html('<div style="color:red;">任務ID無效</div>');
-			} else if (data.status == 'Task Type Not Supported') {
+			} else if (data.status === 'Task Type Not Supported') {
 				$('#hint_task').html('<div style="color:red;">任務類型尚不支持</div>');
-			} else if (data.status == 'Task Not Finished') {
+			} else if (data.status === 'Task Not Finished') {
 				$('#hint_task').html('<div style="color:red;">任務未完成，下次再來查詢哦！當前進度：' + data.progress + '%</div>');
 			}
 		});
@@ -67,7 +72,7 @@ $(document).ready(function(){
 		$('#gdriveid_div').html('離線服務器Cookies：gdriveid=' + gdriveid + '');
 	});
 
-	if ($.cookie('task_id')!= undefined) {
+	if ($.cookie('task_id')!== undefined) {
 		$('#task_id_input').val($.cookie('task_id'));
 		$('#submit_task_id_btn').click();
 	}

@@ -29,7 +29,7 @@
 		    <!-- Left Nav Section -->
 		    <ul class="left">
 		      <li class="active"><a href="index.html">提交任務</a></li>
-		      <li><a href="multi_task.html">批量任務</a></li>
+		      <li style="display:none;"><a href="multi_task.html">批量任務</a></li>
 		      <li><a href="https://github.com/Chion82/ThunderHack/raw/master/chrome-ext.crx">下載Chrome插件</a></li>
 		      <li><a href="https://github.com/Chion82/xunlei_share">CLI</a></li>
 		      <li><a href="#">API(Coming Soon)</a></li>
@@ -44,17 +44,21 @@
 					</div>
 				</div>
 				<div class="row collapse">
-					<div class="small-10 columns">
-						<input type="text" id="magnet_input">
+					<input type="text" id="magnet_input">
+				</div>
+				<div class="row collapse">
+					<div class="small-4 columns">
+						<img src="/api/verify_code" style="max-width:200px;display:inline;" id="verify_code_image" />
 					</div>
-					<div class="small-2 columns">
-						<button id="submit_task_btn" class="button postfix">提交下載任務</button>
+					<div class="small-8 columns" style="text-align:right;">
+						<input type="text" id="verify_code_input" style="display:inline;max-width:200px;" placeholder="输入验证码" />
+						<button id="submit_task_btn" class="button postfix" style="display:inline;max-width:200px;">提交下載任務</button>
 					</div>
 				</div>
 				<div class="panel">
 					<div class="row">
 						只有.torrent文件？<a href="http://tool.idanmu.com" target="_blank">點這裏</a>轉換成magnet
-						<br/>如果提示-12失敗，請多試幾次<br/>
+						<br/>
 					</div>
 					<div class="row">
 						<div id="hint_submit" style="color:red;"></div>

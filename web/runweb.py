@@ -4,7 +4,7 @@ import requests
 from urllib import quote
 import re
 import json
-from flask import Flask, request, jsonify, redirect
+from flask import Flask, request, jsonify, redirect, make_response
 from login import thunder_login
 import datetime
 import thread, time, os
@@ -33,7 +33,7 @@ def commit_bt_task(bt_info, retry=10):
 	session = app.config['thunder_session']
 	uid = app.config['thunder_uid']
 	if (retry <= 0):
-		return {'status':'Failed', 'error':'提交失败，请重试。'}
+		return {'status':'Failed', 'error':'提交失败，请重新输入验证码重试。'}
 	payload = {
 		'uid' : uid,
 		'btname' : bt_info['btname'],
@@ -42,8 +42,13 @@ def commit_bt_task(bt_info, retry=10):
 		'silverbean' : 0,
 		'findex' : bt_info['findex']
 	}
+	if 'verify_code' in request.form:
+		payload['verify_code'] = request.form['verify_code']
+		verify_key = request.form['verify_key']
+		session.headers.update({'Cookie': str(session.headers.get('Cookie')) + 'VERIFY_KEY=' + verify_key + ';'})
 	try:
 		request_result = session.post('http://dynamic.cloud.vip.xunlei.com/interface/bt_task_commit?callback=jsonp', data=payload)
+		print(request_result.content)
 		result_json = str(request_result.content)[6:]
 		result_json = result_json[0:len(result_json)-1]
 		result = json.loads(result_json)
@@ -60,10 +65,17 @@ def commit_normal_task(url, retry=10):
 	reload_config(True)
 	session = app.config['thunder_session']
 	uid = app.config['thunder_uid']
+	request_url = 'http://dynamic.cloud.vip.xunlei.com/interface/task_commit?callback=ret_task&uid=' + uid + '&url=' + quote(url)
+
+	if 'verify_code' in request.form:
+		request_url = request_url + '&verify_code=' + request.form['verify_code']
+		verify_key = request.form['verify_key']
+		session.headers.update({'Cookie': str(session.headers.get('Cookie')) + 'VERIFY_KEY=' + verify_key + ';'})
+
 	if (retry <= 0):
-		return {'status':'Failed', 'error':'提交失败，请重试。'}
+		return {'status':'Failed', 'error':'提交失败，请重新输入验证码重试。'}
 	try:
-		result = session.get('http://dynamic.cloud.vip.xunlei.com/interface/task_commit?callback=ret_task&uid=' + uid + '&url=' + quote(url))
+		result = session.get(request_url)
 		match = re.search(r'ret_task\(.*?,\'(.*?)\',\'.*?\'\)', str(result.content))
 		if (not match):
 			if '"progress":-12' in str(request.content):
@@ -181,12 +193,23 @@ def API_get_task_info(task_id):
 def API_get_gdriveid():
 	return jsonify({'gdriveid':app.config['thunder_gdriveid']})
 
+@app.route('/api/verify_code', methods=['GET'])
+def API_get_verify_code():
+	reload_config(True)
+	session = app.config['thunder_session']
+	image_result = session.get('http://verify2.xunlei.com/image?t=MVA')
+	resp = make_response(str(image_result.content))
+	resp.headers['Content-Type'] = 'image/jpeg'
+	resp.headers['Verify-Key'] = image_result.cookies['VERIFY_KEY']
+	resp.set_cookie('verify_key', image_result.cookies['VERIFY_KEY'])
+	return resp
+
 @app.route('/')
 def index():
 	return '<script>window.location.href="index.html"</script>'
 
 if __name__ == '__main__':
-	reload_config()
+	reload_config()			#TODO: Set the argument to True if debugging
 	app.run(host='0.0.0.0', port=90, debug=True)
 
 def run_app(environ, start_response):
