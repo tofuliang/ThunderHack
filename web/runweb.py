@@ -191,6 +191,7 @@ def API_get_task_info(task_id):
 
 @app.route('/api/gdriveid', methods=['GET'])
 def API_get_gdriveid():
+	reload_config(True)
 	return jsonify({'gdriveid':app.config['thunder_gdriveid']})
 
 @app.route('/api/verify_code', methods=['GET'])
