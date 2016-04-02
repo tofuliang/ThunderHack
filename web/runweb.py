@@ -205,6 +205,15 @@ def API_get_verify_code():
 	resp.set_cookie('verify_key', image_result.cookies['VERIFY_KEY'])
 	return resp
 
+@app.route('/api/update_cookie.do', methods=['POST'])
+def API_update_cookie():
+	auth_key = (json.loads(open('login_info.json', 'r').read()))['auth_key']
+	if (request.form['auth_key'] != auth_key):
+		return jsonify({'status':'Invalid auth_key.'})
+	with open('cookie.txt', 'w') as f:
+		f.write(request.form['cookie'])
+	return jsonify({'status':'OK'})
+
 @app.route('/')
 def index():
 	return '<script>window.location.href="index.html"</script>'

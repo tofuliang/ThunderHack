@@ -2,6 +2,7 @@ import requests
 from urllib import quote, unquote
 import re
 import json
+import subprocess
 
 PASSWORD_ENCRYPT_HOST = 'http://localhost:3010'
 
@@ -21,9 +22,18 @@ def thunder_login():
 	request_result = session.get('https://login2.xunlei.com/check/?u=' + quote(email) + '&business_type=108')
 	
 	#Get RSA-encrypted password
-	request_url = PASSWORD_ENCRYPT_HOST + '/api/crypto/rsa_encrypt.do?check_n=' + request_result.cookies['check_n'] + '&check_e=' + quote(request_result.cookies['check_e']) + '&captcha=' + quote(request_result.cookies['check_result'].split(':')[1]) + '&pwd=' + quote(password)
-	encrypted_password = json.loads(requests.get(request_url).text)['encrypted_pwd']
-	
+	#request_url = PASSWORD_ENCRYPT_HOST + '/api/crypto/rsa_encrypt.do?check_n=' + request_result.cookies['check_n'] + '&check_e=' + quote(request_result.cookies['check_e']) + '&captcha=' + quote(request_result.cookies['check_result'].split(':')[1]) + '&pwd=' + quote(password)
+	#encrypted_password = json.loads(requests.get(request_url).text)['encrypted_pwd']
+
+	encrypted_password = json.loads(subprocess.check_output([
+			'node',
+			'crypto.js', 
+			unquote(request_result.cookies['check_n']), 
+			request_result.cookies['check_e'], 
+			request_result.cookies['check_result'].split(':')[1], 
+			str(password)
+		]))['encrypted_pwd']
+
 	#login request
 	login_result_raw = session.post('https://login2.xunlei.com/sec2login/', {
 			'p' : encrypted_password,
@@ -35,6 +45,7 @@ def thunder_login():
 			'business_type' : 108,
 			'v' : 100
 		})
+
 	cookies = get_cookies(login_result_raw.cookies)
 
 	#Enter home page to get gdriveid
