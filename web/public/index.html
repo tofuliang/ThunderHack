@@ -10,6 +10,7 @@
 		<script src="bower_components/foundation/js/foundation.min.js" type="text/javascript"></script>
 		<script src="bower_components/foundation/js/foundation/foundation.topbar.js" type="text/javascript"></script>
 		<script src="js/index.js" type="text/javascript"></script>
+		<style>.button.postfix{border-right: 1px solid #FFFFFF}</style>
 	</head>
 	<body>
 		<nav class="top-bar" data-topbar role="navigation">
@@ -29,7 +30,7 @@
 		    <!-- Left Nav Section -->
 		    <ul class="left">
 		      <li class="active"><a href="index.html">提交任務</a></li>
-		      <li style="display:none;"><a href="multi_task.html">批量任務</a></li>
+		      <li><a href="multi_task.html">批量任務</a></li>
 		      <li><a href="https://github.com/Chion82/ThunderHack/raw/master/chrome-ext.crx">下載Chrome插件</a></li>
 		      <li><a href="https://github.com/Chion82/xunlei_share">CLI</a></li>
 		      <li><a href="#">API(Coming Soon)</a></li>
@@ -75,12 +76,28 @@
 					</div>
 				</div>
 				<div class="row collapse">
-					<div class="small-10 columns">
+					<div class="small-3 columns">
 						<input type="text" id="task_id_input">
 					</div>
-					<div class="small-2 columns">
+					<div class="small-1 columns">
 						<button id="submit_task_id_btn" class="button postfix">查詢</button>
 					</div>
+					<div class="small-2 columns">
+						<button id="aria2_rpc" class="button postfix">RPC到Aria2</button>
+					</div>
+					<div class="small-2 columns">
+						<button id="get_aria2_command" class="button postfix hide-rpc">生成Aria2命令</button>
+					</div>
+					<div class="small-2 columns">
+						<button id="get_aria2_file" class="button postfix hide-rpc">生成Aria2文件</button>
+					</div>
+					<div class="small-2 columns">
+						<button id="get_idm_file" class="button postfix hide-rpc">生成IDM文件</button>
+					</div>
+				</div>
+				<div class="row" id="notice-holder">
+				</div>
+				<div class="row collapse" id="aria2-rpcs" style="background-color: #d3e7ef; padding-top: 24px;margin-bottom: 20px;display: none;">
 				</div>
 				<div class="row">
 					<div class="large-12 columns">
