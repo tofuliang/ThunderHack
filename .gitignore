@@ -2,5 +2,6 @@ web/cookie.txt
 web/public/bower_components
 web/node_modules
 web/login_info.json
+web/backendHost
 *.pyc
 .DS_Store
