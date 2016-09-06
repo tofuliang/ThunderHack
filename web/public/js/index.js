@@ -112,7 +112,7 @@ $(document).ready(function(){
 			if(!missionData.records[index]) return;
 
 			var rec = missionData.records[index];
-			cmd+='nohup aria2c  -c -s15 -x15 --stream-piece-selector=inorder --file-allocation=none --out ' + safeTitle(rec.title) + ' --header \'Cookie: gdriveid=' + gdriveid + ';\' ' + rec.downurl + " &\n\n";
+			cmd+='nohup aria2c  -c -s15 -x15 --stream-piece-selector=inorder --file-allocation=none --out ' + safeTitle(rec.title) + ' --header \'Cookie: gdriveid=' + gdriveid + ';\' "' + rec.downurl + "\" &\n\n";
 			
 		});
 
