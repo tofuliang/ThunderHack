@@ -40,3 +40,17 @@ The recommanded way to use this app is simply installing the Chrome extension by
 * API documentation.
 
 * Deployment in production mode.
+
+# Docker
+
+## build Docker images
+
+```
+# docker build -t thunderhack .
+```
+
+## run in docker container
+
+```
+# docker run -d -v /pathto/ThunderHack/web:/usr/local/var/app -p 90:90 thunderhack
+```
