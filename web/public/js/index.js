@@ -4,7 +4,8 @@ $(document).ready(function(){
 	var missionData,gdriveid = '';
 	var thunderFilenameMask = [0x61, 0x31, 0xe4, 0x5f, 0x00, 0x00, 0x00, 0x00];
 
-	function wantedFile(ext){
+	function wantedFile(file){
+		var ext = file.ext || file.title.split('.').pop();
 		return $.inArray(ext,['mkv','mp4','mp3','wmv','exe','msi','dmg','pkg']) > -1 ? 'checked' : '' ;
 	}
 
@@ -33,7 +34,7 @@ $(document).ready(function(){
 		return result.join("");
 	}
 
-	function url_rewrite(url, filename){
+	function urlRewrite(url, filename){
 		url = url.replace(/&n=\w+/, "&n=" + thunderFilenameEncode(filename));
 		return url;
 	}
@@ -91,7 +92,7 @@ $(document).ready(function(){
 				missionData = data;
 				for (index in data.records) {
 					record = data.records[index];
-					$('#hint_task').append('<li><span style="display: inline-block;width: 95%" ><a target="_blank" href="' + record.downurl + '">' + record.title + ' ' + record.size + '</a> </span><span data-index="'+ index +'" ><input type="checkbox" '+ wantedFile(record.ext)+' /></span></li>');
+					$('#hint_task').append('<li><span style="display: inline-block;width: 95%" ><a target="_blank" href="' + record.downurl + '">' + record.title + ' ' + record.size + '</a> </span><span data-index="'+ index +'" ><input type="checkbox" '+ wantedFile(record)+' /></span></li>');
 				}
 				$('#hint_task').append('</ul>')
 			} else if (data.status === 'Task Not Found') {
@@ -151,7 +152,7 @@ $(document).ready(function(){
 			if(!missionData.records[index]) return;
 
 			var rec = missionData.records[index];
-			str += '<\r\n' + url_rewrite(rec.downurl, safeTitle(rec.title)) + '\r\ncookie: gdriveid=' + gdriveid + '\r\n>\r\n';
+			str += '<\r\n' + urlRewrite(rec.downurl, safeTitle(rec.title)) + '\r\ncookie: gdriveid=' + gdriveid + '\r\n>\r\n';
 		});
 		var url = "data:text/html;charset=utf-8," + encodeURIComponent(str);
 		var aLink = document.createElement('a');
