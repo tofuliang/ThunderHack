@@ -112,7 +112,7 @@ $(document).ready(function(){
 			if(!missionData.records[index]) return;
 
 			var rec = missionData.records[index];
-			cmd+='nohup aria2c  -c -s15 -x15 --stream-piece-selector=inorder --file-allocation=none --out ' + safeTitle(rec.title) + ' --header \'Cookie: gdriveid=' + gdriveid + ';\' "' + rec.downurl + "\" &\n\n";
+			cmd+='nohup aria2c  -c -s15 -x15 --stream-piece-selector=inorder --file-allocation=none --out ' + safeTitle(rec.title) + ' --header "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36" --header \'Cookie: gdriveid=' + gdriveid + ';\' "' + rec.downurl + "\" &\n\n";
 			
 		});
 
@@ -134,7 +134,7 @@ $(document).ready(function(){
 			if(!missionData.records[index]) return;
 
 			var rec = missionData.records[index];
-			str+=rec.downurl + '\r\n  out=' + safeTitle(rec.title) + '\r\n  header=Cookie: gdriveid=' + gdriveid + '\r\n  continue=true\r\n  stream-piece-selector=inorder\r\n  file-allocation=none\r\n  max-connection-per-server=15\r\n  split=15\r\n\r\n';
+			str+=rec.downurl + '\r\n  out=' + safeTitle(rec.title) + '\r\n  header=Cookie: gdriveid=' + gdriveid + '\r\n  header=User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36\r\n  continue=true\r\n  stream-piece-selector=inorder\r\n  file-allocation=none\r\n  max-connection-per-server=15\r\n  split=15\r\n\r\n';
 		});
 		var url = "data:text/html;charset=utf-8," + encodeURIComponent(str);
 		var aLink = document.createElement('a');
